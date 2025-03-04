@@ -29,7 +29,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[Whimsy Code of Conduct](https://github.com/Nykenik24/Whimsy/blob//CODE_OF_CONDUCT.md).
+[Whimsy Code of Conduct](/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to <Nykenik24@proton.me>.
 
