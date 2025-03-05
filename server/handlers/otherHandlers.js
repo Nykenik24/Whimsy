@@ -21,6 +21,20 @@ const otherHandlers = {
       });
     };
   },
+  clientCount: function (io) {
+    return (data) => {
+      io.emit("client-count", { count: io.engine.clientsCount });
+    };
+  },
+  getUsers: function (io, users) {
+    return (data) => {
+      io.emit("get-users", {
+        users: users,
+        count: Object.keys(users).length,
+        connected: io.engine.clientsCount,
+      });
+    };
+  },
 };
 
 module.exports = otherHandlers;

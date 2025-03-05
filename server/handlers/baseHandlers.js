@@ -25,9 +25,17 @@ const baseHandlers = {
       }
     };
   },
-  onDisconnect: function () {
+  onDisconnect: function (users, username) {
     return (reason) => {
       console.log("Client disconnected because of '" + reason + "'");
+      const currentDate = new Date();
+      const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getDate().toString().padStart(2, "0")}`;
+      const time = `${currentDate.getHours().toString()}:${currentDate.getMinutes().toString()}:${currentDate.getSeconds().toString()}`;
+      users[username] = {
+        status: "disconnected",
+        left_on: `${formattedDate} ${time}`,
+        connected_on: users[username].connected_on,
+      };
     };
   },
 };

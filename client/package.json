@@ -1,0 +1,18 @@
+{
+  "name": "whimsy-client",
+  "version": "0.0.1",
+  "description": "Whimsy Client - A secure terminal chat app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Nykenik24",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "readline-sync": "^1.4.10",
+    "socket.io-client": "^4.5.0",
+	"moment": "^2.29.1"
+  }
+}
+
