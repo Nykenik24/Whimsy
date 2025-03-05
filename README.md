@@ -11,7 +11,6 @@ First, install the dependencies:
 - For node, go to `server` and run `npm install`
 - For python, install this packages with your preferred method:
     - `socketio`
-    - `rich`
     - `websocket-client`
 
 In the future, binaries will be released so users don't need to setup manually.
