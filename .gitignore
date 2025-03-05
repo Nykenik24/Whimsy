@@ -5,3 +5,6 @@
 # client
 # python
 __py_cache__
+
+# npm
+/client/node_modules
