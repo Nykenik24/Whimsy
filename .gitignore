@@ -1,0 +1,7 @@
+# server
+# npm
+/server/node_modules/
+
+# client
+# python
+__py_cache__
