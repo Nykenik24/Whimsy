@@ -4,7 +4,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-const setupWebSocket = require("./server.js");
+const { startServer } = require("./server"); // Import the startServer function
 
 const app = express();
 const server = http.createServer(app);
@@ -18,10 +18,11 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-// Setup the server
-setupWebSocket(server);
+// Setup the server and socket.io
+startServer(server);
 
-const args = process.argv.slice(2); // Remove first two default arguments
+// Start the Express server with the same port
+const args = process.argv.slice(2); // Process command-line arguments
 
 // Function to parse arguments
 function getArgValue(flag) {
@@ -31,7 +32,7 @@ function getArgValue(flag) {
 
 const port = getArgValue("port") || 3000; // Default to 3000 if not provided
 
-// Start the server
+// Start the server on the specified port
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

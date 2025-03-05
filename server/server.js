@@ -1,66 +1,51 @@
-const socketIO = require("socket.io");
-const handlers = require("./handlers/__init__.js");
-const crypto = require("crypto");
+const socketIo = require("socket.io");
+const handlers = require("./handlers/handlers.js"); // Import the aggregated handlers
 
-function getRandomId(length) {
-  return crypto.randomBytes(length).toString("hex");
-}
+// Array to keep track of connected users and their usernames
+let users = [];
 
-var users = {};
+// Function to initialize the server and handle socket connections
+function startServer(server) {
+  const socketServer = socketIo(server); // Use the passed server for Socket.IO
 
-function setupWebSocket(server) {
-  const io = socketIO(server);
+  console.log("Server is running and listening for socket connections...");
 
-  // WebSocket connection handling
-  io.on("connection", (socket) => {
-    const currentDate = new Date();
-    const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getDate().toString().padStart(2, "0")}`;
-    const time = `${currentDate.getHours().toString()}:${currentDate.getMinutes().toString()}:${currentDate.getSeconds().toString()}`;
+  socketServer.on("connection", (socket) => {
+    console.log("New connection:", socket.id);
 
-    const username = socket.request.headers.user;
-    if (username != "undefined") {
-      users[username] = {
-        status: "connected",
-        connected_on: `${formattedDate} ${time}`,
-      };
-    }
+    // Check for username availability
+    socket.on("check-username", handlers.checkUsername(socketServer, users));
 
-    io.emit("client-connect", {
-      generated_id: getRandomId(30),
-      status: 0,
+    // Handle username-taken event
+    socket.on("username-taken", handlers.usernameTaken(socketServer));
+
+    // Handle new client connection
+    socket.on("client-connect", (data) => {
+      const { user } = data;
+      console.log(`${user} has connected`);
     });
 
-    io.emit("message", {
-      msg: `Welcome, ${username}!`,
-      user: "SYSTEM",
-      status: "ok",
-      date: formattedDate,
-      time: time,
-      id: getRandomId(30),
-    });
-
-    console.log("New client connected");
-
-    // Triggered when disconnected
+    // Handle client disconnect
     socket.on(
       "disconnect",
-      handlers.baseHandlers.onDisconnect(users, username),
+      handlers.onDisconnect(socketServer, users, [], server),
     );
 
-    // Handle messages
-    socket.on("message", handlers.baseHandlers.onMessage(io));
+    // Listen for messages from clients
+    socket.on("message", handlers.onMessage(socketServer));
 
-    // Handle user-disconnect
-    socket.on("user-disconnect", handlers.otherHandlers.userDisconnect(io));
+    // Listen for client count
+    socket.on("client-count", handlers.clientCount(socketServer));
 
-    // Handle client-count
-    socket.on("client-count", handlers.otherHandlers.clientCount(io));
+    // Listen for getting connected users
+    socket.on("get-users", handlers.getUsers(socketServer, users));
 
-    // Handle get-users
-    socket.on("get-users", handlers.otherHandlers.getUsers(io, users));
+    // Handle 'user-disconnect' event when a user manually disconnects
+    socket.on("user-disconnect", handlers.userDisconnect(socketServer, users));
   });
 
-  console.log("WebSocket server setup");
+  return socketServer; // Return the socketServer instance if needed elsewhere
 }
 
-module.exports = setupWebSocket;
+// Export the startServer function
+module.exports = { startServer };

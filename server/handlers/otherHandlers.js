@@ -5,27 +5,39 @@ function getRandomId(length) {
 }
 
 const otherHandlers = {
-  userDisconnect: function (io) {
+  userDisconnect: function (io, clients, server) {
     return (data) => {
-      console.log("User '" + data.user + "' disconnected");
-      const currentDate = new Date();
-      const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getDate().toString().padStart(2, "0")}`;
-      const time = `${currentDate.getHours().toString()}:${currentDate.getMinutes().toString()}:${currentDate.getSeconds().toString()}`;
+      const username = data.user;
+      console.log(`${username} disconnected`);
+
       io.emit("message", {
-        msg: `User ${data.user} disconnected.`,
+        msg: `User ${username} disconnected.`,
         user: "SYSTEM",
         status: "ok",
-        date: formattedDate,
-        time: time,
-        id: getRandomId(30),
       });
+
+      io.emit("client-count", { count: clients.length });
+
+      // Check if the host left and assign a new one
+      if (clients.length > 0 && username === clients[0].request.headers.user) {
+        console.log("Host left. Assigning new host...");
+        clients[0].emit("new-host", { msg: "You are now the host." });
+      }
+
+      // If no clients left, shut down the server
+      if (clients.length === 0) {
+        console.log("No clients left. Shutting down server...");
+        server.close(() => process.exit(0));
+      }
     };
   },
+
   clientCount: function (io) {
     return (data) => {
       io.emit("client-count", { count: io.engine.clientsCount });
     };
   },
+
   getUsers: function (io, users) {
     return (data) => {
       io.emit("get-users", {
