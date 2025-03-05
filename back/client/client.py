@@ -1,6 +1,7 @@
-from random import randint
+from random import choice, randint
 
 import socketio
+from rich import color as richcolor
 from terminalVersion import console
 from terminalVersion import main as terminal_main
 from terminalVersion import render_start as terminal_start
@@ -17,6 +18,11 @@ class SocketClient:
         self.on_message_callback = None
         self.username = flags.get("username", f"Jhon Doe {randint(0, int(10e10))}")
         self.id = None
+        if "color" in flags:
+            if flags["color"] in list(richcolor.ANSI_COLOR_NAMES.keys()):
+                self.color = flags["color"]
+            else:
+                self.color = choice(list(richcolor.ANSI_COLOR_NAMES.keys()))
 
         self.sio.on("message", self._receive_message)
         self.sio.on("client-connect", self._connect_callback)
@@ -27,9 +33,15 @@ class SocketClient:
 
     def connect(self):
         try:
-            self.sio.connect(self.server_url)
+            self.sio.connect(self.server_url, headers={"user": self.username})
             console.print(c(f"Connected to server at {self.server_url}", "green"))
-            self.sio.emit("message", {"msg": f"Welcome, {self.username}!", "user": "SERVER"})
+            console.print()
+            # self.sio.emit("message", {
+            #                             "msg": f"Welcome, {self.username}!",
+            #                             "user": "SERVER",
+            #                             "broadcast": True
+            #                          })
+            self.sio.sleep(0.5)
         except Exception as e:
             console.print(c(f"Connection error: {e}", "red"))
             return False
@@ -41,7 +53,7 @@ class SocketClient:
 
     def send_message(self, message, broadcast=True):
         if self.sio.connected:
-            self.sio.emit("message", {"msg": message, "user": self.username, "broadcast": broadcast})
+            self.sio.emit("message", {"msg": message, "user": self.username, "broadcast": broadcast, "color": self.color})
         else:
             console.print(c("Not connected to server.", "red"))
 
@@ -50,7 +62,6 @@ class SocketClient:
 
     def disconnect(self):
         if self.sio.connected:
-            console.print(c(f"Sending user-disconnect event for {self.username}", "yellow"))
             self.sio.emit("user-disconnect", {"user": self.username})
             self.sio.sleep(0.1)
             self.sio.disconnect()
@@ -66,6 +77,11 @@ class SocketClient:
 
 if __name__ == "__main__":
     terminal_start()
-    terminal_main(SocketClient(flags{
-        "username": console.input(c("What is your name?", "yellow") + ": ")
+    username = console.input(c("What is your name?", "yellow") + ": ")
+    console.print(c("TIP: Leave the color empty for a random one", "cyan"))
+    user_color = console.input(c("What color do you want?", "yellow") + ": ")
+
+    terminal_main(SocketClient(flags={
+        "username": username,
+        "color": user_color
     }))

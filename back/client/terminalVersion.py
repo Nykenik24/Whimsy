@@ -1,4 +1,4 @@
-from random import randint
+from random import choice, randint
 
 import socketio
 from rich.console import Console
@@ -33,17 +33,17 @@ def render_start():
     console.print(c("You are now using the terminal-based client of Whimsy.", "green"))
     usage()
 
-    console.print(c("You are getting connected to the server...", "red"))
-
 
 def main(client):
+    console.print(c("You are getting connected to the server...", "red"))
+
     def callback(data):
         if data["user"] != client.username:
             msg = data["msg"]
             before = f"{data['date']} {data['time']} {data['user']}: "
-            before_color = "red" if data["user"] == "SYSTEM" else "yellow"
+            before_color = "red" if data["user"] == "SYSTEM" else data["color"]
             if msg:
-                console.print()
+                print("\r\033[2K", end="")
                 console.print(c(before, before_color) + msg)
                 console.print(c(f"{client.username}> ", "cyan"), end="")
 
