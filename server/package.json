@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"No test specified\" && exit 0"
+	"client": "python client/client.py"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -4,7 +4,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-const setupWebSocket = require("./socket/wsServer.js");
+const setupWebSocket = require("./server.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,7 +21,17 @@ app.get("/", (req, res) => {
 // Setup the server
 setupWebSocket(server);
 
+const args = process.argv.slice(2); // Remove first two default arguments
+
+// Function to parse arguments
+function getArgValue(flag) {
+  const arg = args.find((arg) => arg.startsWith(`--${flag}=`));
+  return arg ? arg.split("=")[1] : null;
+}
+
+const port = getArgValue("port") || 3000; // Default to 3000 if not provided
+
 // Start the server
-server.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+server.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });

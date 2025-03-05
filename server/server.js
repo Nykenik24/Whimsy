@@ -1,5 +1,5 @@
 const socketIO = require("socket.io");
-const handlers = require("../handlers/__init__.js");
+const handlers = require("./handlers/__init__.js");
 const crypto = require("crypto");
 
 function getRandomId(length) {

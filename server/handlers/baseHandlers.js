@@ -21,7 +21,6 @@ const baseHandlers = {
           date: formattedDate,
           time: time,
           id: getRandomId(30),
-          color: data.color,
         });
       }
     };
