@@ -34,4 +34,8 @@ secure chatting compared to other apps, like the afromentioned Discord.
 ## How does it work?
 When using Whimsy, you can either join or host a chat room. Whimsy uses a local tunnel + websocket system to open a local server in the host's machine and allow for other people to join.
 
+![Visual representation of join/host system](https://github.com/user-attachments/assets/e9394d47-da20-4c0e-80f2-b7cc0b8a6e56)
+
 When the host of a chat room leaves, the tunnel is transferred to the next user (the user that connected before all other connected users).
+
+![Visual representation of host transfer](https://github.com/user-attachments/assets/75c444ca-1a3e-45f3-aaac-3f3bd8cc1eec)
