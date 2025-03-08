@@ -1,5 +1,5 @@
 # Whimsy
-Whimsy is a peer-to-peer chatting app with a simple terminal-based chat app made in NodeJS.
+Whimsy is a simple terminal-based chat app made in NodeJS.
 
 It is a hobby project and is completely open source, it contains commented and readable code for learning purpose.
 
