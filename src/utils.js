@@ -23,16 +23,26 @@ function error(message) {
   process.exit(1);
 }
 
-function applyCamelCase(str) {
+function stripUsername(str) {
   return str
     .split(" ") // Split the string by spaces
     .map((word, index) => {
       if (index === 0) {
-        return word; // Keep the first word in lowercase
+        return word; // Keep the first word
       }
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize the first letter of subsequent words
     })
     .join(""); // Join the array back into a string without spaces
 }
 
-module.exports = { sleep, getRandomID, error, applyCamelCase };
+function getRandomURL(len = 10) {
+  return `whimsy.${crypto.randomBytes(len / 2).toString("hex")}`;
+}
+
+module.exports = {
+  sleep: sleep,
+  getRandomID: getRandomID,
+  error: error,
+  stripUsername: stripUsername,
+  getRandomURL: getRandomURL,
+};

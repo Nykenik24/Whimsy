@@ -40,12 +40,13 @@ const logger = {
   // Misc.
   question: newLogType("[?] ", { color: "cyan" }),
   system: newLogType("[/] ", { color: "redBright" }),
+  chatroom_log: newLogType("[>] ", { color: "greenBright" }),
   message: newLogType("", { color: "yellowBright" }, (str, opts) => {
     const data = opts.data;
     const user = data.user || "unknown";
     const timestamp = data.timestamp || "0000-00-00 00:00:00";
     if (opts.colorize) {
-      return `${chalk.blue(user)} at ${chalk.green(timestamp)}: ${chalk.white(str)}`;
+      return `${chalk.blue(user)} at ${chalk.gray(timestamp)}: ${chalk.white(str)}`;
     } else {
       return `${user} at ${timestamp}: ${str}`;
     }
