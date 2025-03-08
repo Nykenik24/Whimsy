@@ -19,7 +19,11 @@ const rl = readline.createInterface({
 const CLI = require("clui");
 
 // Utils
-const { sleep, getRandomID, error, applyCamelCase } = require("./src/utils");
+const utils = require("./src/utils");
+const sleep = utils.sleep;
+const stripUsername = utils.stripUsername;
+
+// Logger
 const logger = require("./src/logger");
 
 // Server & client
@@ -30,15 +34,13 @@ console.log(chalk.blue(bigText));
 
 rl.question("What is your name?: ", (username) => {
   switch (username) {
-    case "SYSTEM":
-      error("Your username can't be SYSTEM");
     case "":
     case null:
     case undefined:
       error("No username");
     default:
       if (username.includes(" ")) {
-        username = applyCamelCase(username);
+        username = stripUsername(username);
         logger.warn("Usernames can't have spaces");
         logger.info(
           `Your username was automatically converted into ${username}`,
