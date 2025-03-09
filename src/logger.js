@@ -40,7 +40,7 @@ const logger = {
   // Misc.
   question: newLogType("[?] ", { color: "cyan" }),
   system: newLogType("[/] ", { color: "redBright" }),
-  chatroom_log: newLogType("[>] ", { color: "greenBright" }),
+  chatroomLog: newLogType("[>] ", { color: "greenBright" }),
   message: newLogType("", { color: "yellowBright" }, (str, opts) => {
     const data = opts.data;
     const user = data.user || "unknown";

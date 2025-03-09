@@ -10,8 +10,11 @@ const bigText = `
 // Terminal style and output
 const chalk = require("chalk");
 const readline = require("readline");
+const MuteStream = require("mute-stream");
+const ms = new MuteStream();
+ms.pipe(process.stdout);
 const rl = readline.createInterface({
-  output: process.stdout,
+  output: ms,
   input: process.stdin,
 });
 
@@ -32,7 +35,7 @@ const client = require("./src/client");
 
 console.log(chalk.blue(bigText));
 
-rl.question("What is your name?: ", (username) => {
+rl.question(chalk.yellow("What is your name?: "), (username) => {
   switch (username) {
     case "":
     case null:
@@ -50,20 +53,55 @@ rl.question("What is your name?: ", (username) => {
   }
 
   rl.question(
-    "Do you want to join a chatroom or host your own?: ",
+    chalk.yellow("Do you want to join a chatroom or host your own?: "),
     (joinOrHost) => {
       switch (joinOrHost) {
         case "join":
           logger.info("TODO"); // TODO: Join rooms (client)
-          break;
+          process.exit(0);
         case "host":
-          logger.info("TODO"); // TODO: Host rooms (server)
+          rl.question(
+            chalk.blue("What port do you want to use (from 1000 to 99999)?: "),
+            (port) => {
+              if (port < 1000) {
+                logger.error("Port can't be lower than 1000");
+                return;
+              } else if (port > 99999) {
+                logger.error("Port can't be greater than 99999");
+                return;
+              }
+
+              console.log("");
+              console.log(chalk.green("--- ROOM CONFIGURATION ---"));
+              const options = {};
+              rl.question(
+                chalk.blue("Maximum people (default is 16): "),
+                (maxPeople) => {
+                  options.maxPeople = maxPeople;
+                  rl.question(chalk.blue("Mode (public/private): "), (mode) => {
+                    options.mode = mode;
+                    if (mode === "private") {
+                      process.stdout.write(chalk.red("Room password: "));
+                      ms.mute();
+                      rl.question("", (password) => {
+                        ms.unmute();
+                        console.log("");
+                        options.password = password;
+                        server.host(port, options);
+                      });
+                    } else {
+                      server.host(port, options);
+                    }
+                  });
+                },
+              );
+            },
+          );
           break;
         default:
           error("Invalid value");
           break;
       }
-      process.exit(0); // Temporary!!!
     },
   );
 });

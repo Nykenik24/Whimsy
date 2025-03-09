@@ -10,6 +10,7 @@ const socketIO = require("socket.io");
 // Utils
 const utils = require("./utils");
 const getRandomURL = utils.getRandomURL;
+const getRandomID = utils.getRandomID;
 // Date
 const dayjs = require("dayjs");
 // Hashing
@@ -39,104 +40,95 @@ async function checkURL(url) {
 }
 
 async function setupTunnel(port) {
-  const tunnel = await localtunnel({
-    port: port,
-    subdomain: getRandomURL(),
+  const TIMEOUT_MS = 10000; // 10 seconds max
+
+  return new Promise(async (resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("setupTunnel timed out after 10 seconds"));
+    }, TIMEOUT_MS);
+
+    try {
+      const tunnel = await localtunnel({
+        port: port,
+        //subdomain: getRandomURL(),
+      });
+
+      tunnel.on("close", () => {
+        logger.info(`Tunnel ${tunnel.url} closed.`);
+      });
+
+      clearTimeout(timeout); // Stop the timeout if it succeeds
+      resolve({ tunnel, port });
+    } catch (err) {
+      clearTimeout(timeout);
+      reject(new Error(`Failed to create tunnel: ${err.message}`));
+    }
   });
-  tunnel.on("close", () => {
-    logger.info(`Tunnel ${tunnel.url} closed.`);
-  });
-  return { tunnel: tunnel, port: port };
 }
 
-function setupServer(port, options) {
+async function setupServer(port, options) {
   const server = {};
 
-  const loading = new CLI.Spinner("Setting up the tunnel...");
-  loading.start();
-  (async () => {
+  logger.arrow("Setting up tunnel", " ");
+  try {
     const tunnel = await setupTunnel(port);
-    logger.info(
-      `Tunnel started at ${tunnel.tunnel.url}, share the URL to your friends and tell them to join.`,
-    );
     server.url = tunnel.tunnel.url;
-  })();
-  loading.stop();
+    server.tunnel = tunnel.tunnel;
+    logger.arrow(`Tunnel started at ${server.url}`, " ");
+  } catch (err) {
+    logger.error(`Failed to set up tunnel: ${err.message}`);
+    return;
+  }
 
-  // User history and count
+  logger.arrow("Tunnel setup complete. Starting server...", " ");
+
+  // Proceed only after tunnel is set up
   server.users = [];
-  server.user_count = 0;
+  server.userCount = 0;
+  server.maxPeople = options.maxPeople || 16;
 
-  // User limit
-  server.max_users = options.max || 16;
+  let mode = options.mode === "private" ? "private" : "public";
 
-  // Chatroom mode
-  let mode;
-  switch (options.mode) {
-    case "private":
-      mode = "private";
-      break;
-    case "public":
-      mode = "public";
-    default:
-      mode = "public";
-      break;
-  }
-
-  // Password hashing
-  const passwordHashLoad = new CLI.Spinner(
-    "Hashing password for security reasons...",
-  );
-  passwordHashLoad.start();
+  // Hash password if private
   if (mode === "private") {
+    if (!options.password) {
+      logger.error(`Expected password, got ${options.password}`);
+      process.exit(1);
+    }
+    const passwordHashLoad = new CLI.Spinner("Hashing password...");
+    passwordHashLoad.start();
     const salt = bcrypt.genSaltSync();
-    const hash = bcrypt.hashSync(options.password, salt);
-    server.passwordHash = hash;
+    server.passwordHash = bcrypt.hashSync(options.password, salt);
+    passwordHashLoad.stop();
   }
-  passwordHashLoad.stop();
 
   const io = new socketIO.Server();
   io.listen(port);
+  logger.arrow(`Server listening on port ${port}`, " ");
 
-  // When a user connects
   io.on("connection", (socket) => {
-    // Checks
-    // User count exceded
-    if (server.user_count > server.max_users) {
-      logger.info("A user tried to connect, but the user limit was reached.");
-      socket.disconnect();
-      server.user_count--; // Restore user count, as it was increased
+    if (server.userCount >= server.maxPeople) {
+      logger.warn("User limit reached, rejecting connection.");
+      return socket.disconnect();
     }
 
-    // Password check
     if (mode === "private") {
       const passedPassword = socket.request.headers.password;
-      // No password
-      if (!passedPassword) {
-        logger.info("A user tried to connect without passing a password");
-        socket.disconnect();
-        server.user_count--;
-      }
-      // Password is not correct
-      if (!bcrypt.compareSync(passedPassword, server.passwordHash)) {
-        logger.info(
-          `A user tried to connect, but the password was incorrect: ${passedPassword}`,
-        );
-        socket.disconnect();
-        server.user_count--;
+      if (
+        !passedPassword ||
+        !bcrypt.compareSync(passedPassword, server.passwordHash)
+      ) {
+        logger.warn("Incorrect password attempt.");
+        return socket.disconnect();
       }
     }
 
-    server.user_count++;
-
-    // Get the user's username and default to a random username (e.g. User-ad5829)
+    server.userCount++;
     const username =
       socket.request.headers.username || `User-${getRandomID(6)}`;
-    logger.info(`User connected: ${username}`);
+    logger.connect(`User connected: ${username}`);
 
-    // Create the new User instance
     const user = new User(username);
-    logger.info(`Generated user ID: ${user.id}`);
     server.users.push(user);
 
     socket.on("chat_message", (data) => {
@@ -144,51 +136,13 @@ function setupServer(port, options) {
         contents: data.contents,
         timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       });
-      logger.chatroom_log(data.contents);
+      logger.chatroomLog(data.contents);
     });
 
-    socket.on("new_user", (name) => {
-      io.emit("new_user", {
-        log: `Welcome, ${name}!`,
-        timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-        count: server.users.map((user) => {
-          if (user.status === "connected") {
-            return user;
-          }
-        }).length,
-      });
-      logger.connect(`User ${name}`);
-    });
-
-    socket.on("get_users", (data) => {
-      const filter = data.filter || "all";
-      switch (filter) {
-        case "all":
-          io.emit("get_users", server.users);
-          break;
-        case "connected":
-          io.emit(
-            "get_users",
-            server.users.map((user) => {
-              if (user.status === "connected") {
-                return user;
-              }
-            }),
-          );
-        case "disconnected":
-          io.emit(
-            "get_users",
-            server.users.map((user) => {
-              if (user.status === "disconnected") {
-                return user;
-              }
-            }),
-          );
-          break;
-        default:
-          io.emit("get_users", server.users);
-          break;
-      }
+    socket.on("disconnect", () => {
+      logger.disconnect(`User ${username} disconnected.`);
+      server.userCount--;
+      io.emit("user_disconnect", username);
     });
   });
 
@@ -196,13 +150,21 @@ function setupServer(port, options) {
   return server;
 }
 
-function hostRoom(port, options) {
+async function hostRoom(port, options) {
   logger.doubleArrow("Setting up server");
-  const server = setupServer(port, options);
-  logger.arrow(`Created server at port ${port}`, "\t");
+  const server = await setupServer(port, options);
+  if (!server) {
+    logger.error("Server setup failed. Exiting...");
+    process.exit(1);
+  }
 
+  console.log("");
   console.log(chalk.green("--- CHATROOM LOGS ---"));
-  logger.info("You are now seeing the chatroom logs, to quit, press CTRL + Q");
+  logger.info("You are now seeing the chatroom logs, to quit, press CTRL + C");
+  process.on("SIGINT", () => {
+    logger.info("Quitting...");
+    process.exit(0);
+  });
 }
 
 module.exports = {
