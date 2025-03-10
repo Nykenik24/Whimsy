@@ -61,13 +61,13 @@ rl.question(chalk.yellow("What is your name?: "), (username) => {
           process.exit(0);
         case "host":
           rl.question(
-            chalk.blue("What port do you want to use (from 1000 to 99999)?: "),
+            chalk.blue("What port do you want to use (from 1025 to 65535)?: "),
             (port) => {
-              if (port < 1000) {
-                logger.error("Port can't be lower than 1000");
+              if (port < 1025) {
+                logger.error("Port can't be lower than 1025");
                 return;
-              } else if (port > 99999) {
-                logger.error("Port can't be greater than 99999");
+              } else if (port > 65535) {
+                logger.error("Port can't be greater than 65535");
                 return;
               }
 
