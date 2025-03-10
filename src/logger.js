@@ -1,12 +1,6 @@
 const chalk = require("chalk");
 
-function newLogType(
-  prefix,
-  defaults = { color: "white" },
-  modify = (str) => {
-    return str;
-  },
-) {
+function newLogType(prefix, defaults = { color: "white" }) {
   return function (
     str,
     before = "",
@@ -14,9 +8,9 @@ function newLogType(
   ) {
     if (options.colorize) {
       const colorize = chalk[options.color] || chalk.white;
-      console.log(colorize(`${before}${prefix}${modify(str, options)}`));
+      console.log(colorize(`${before}${prefix}${str}`));
     } else {
-      console.log(`${before}${prefix}${modify(str, options)}`);
+      console.log(`${before}${prefix}${str}`);
     }
   };
 }
@@ -41,16 +35,8 @@ const logger = {
   question: newLogType("[?] ", { color: "cyan" }),
   system: newLogType("[/] ", { color: "redBright" }),
   chatroomLog: newLogType("[>] ", { color: "greenBright" }),
-  message: newLogType("", { color: "yellowBright" }, (str, opts) => {
-    const data = opts.data;
-    const user = data.user || "unknown";
-    const timestamp = data.timestamp || "0000-00-00 00:00:00";
-    if (opts.colorize) {
-      return `${chalk.blue(user)} at ${chalk.gray(timestamp)}: ${chalk.white(str)}`;
-    } else {
-      return `${user} at ${timestamp}: ${str}`;
-    }
-  }),
+  note: newLogType("[()] ", { color: "gray" }),
+  message: newLogType("", { color: "yellowBright" }),
 };
 
 module.exports = logger;

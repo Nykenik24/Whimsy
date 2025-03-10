@@ -14,15 +14,6 @@ function getRandomID(len = 32) {
   return crypto.randomBytes(len).toString("hex");
 }
 
-function error(message) {
-  const logger = require("./logger");
-  logger.error(message);
-  logger.mention(
-    `If you find any bugs, contact @Nykenik24 (email ${chalk.bgBlue.black("Nykenik24@proton.me")}, GitHub ${chalk.bgBlue.black("https://github.com/Nykenik24")})`,
-  );
-  process.exit(1);
-}
-
 function stripUsername(str) {
   return str
     .split(" ") // Split the string by spaces
@@ -42,7 +33,6 @@ function getRandomURL(len = 10) {
 module.exports = {
   sleep: sleep,
   getRandomID: getRandomID,
-  error: error,
   stripUsername: stripUsername,
   getRandomURL: getRandomURL,
 };
