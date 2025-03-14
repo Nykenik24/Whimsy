@@ -29,7 +29,6 @@ secure chatting compared to other apps, like the afromentioned Discord.
 **Notes:**
 - What account refers to is having a database with login data, having the user login and letting them logout, etc.
 - Whimsy isn't made for a replacement to usual chat apps, so accounts are not actually planned. Also, a database would be needed, alongside authentication, two things that I don't know how to manage and can't pay. The nearest things to accounts is having a unique username.
-- What profile refers to is having a username, bio, etc.
 
 ## How does it work?
 When using Whimsy, you can either join or host a chat room. Whimsy uses a local tunnel + websocket system to open a local server in the host's machine and allow for other people to join.
