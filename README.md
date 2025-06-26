@@ -1,36 +1,25 @@
 # Whimsy
-Whimsy is a simple terminal-based chat app made in NodeJS.
 
-It is a hobby project and is completely open source, it contains commented and readable code for learning purpose.
+Whimsy is going through a rework in **Go**. Why? Because it was **TRASH**.
 
-## W.I.P
-Whimsy is currently Work In Progress, I am working hard on it. If you want to contribute, read [**CONTRIBUTING.md**](/CONTRIBUTING.md).
+Not only the code was inconsitent, but also very messy, DRY wasn't applied, there were some dumb bugs, etc.
 
-# Setup
-Install the dependencies with `npm install`.
+That's why Whimsy is being rewritten in Go, and some things are also changing.
 
-# Usage
-Run `npm start`
-> NOTE: In the future, binaries will be released so users don't need to setup and run manually.
+## The new (expected) Whimsy
 
-# More information
-## Why use Whimsy?
-Whimsy isn't designed to be an alternative to already-existing chat apps, such as Discord or Slack. **BUT**, if you want to use Whimsy, it is secure and open-source, completely free and no login data or any confindential data is needed, thus making it a safe alternative for
-secure chatting compared to other apps, like the afromentioned Discord.
-| Feature | Discord | Whimsy |
-| --------------- | --------------- | --------------- |
-| message storing | yes | no |
-| data collection (telemetry) | yes | no |
-| encrypted chats | yes | planned |
-| voice calls | yes | no |
-| peer-to-peer | no | yes |
-| account | yes | no |
+_Note that everything here is conceptual, a goal, not a promise. This is what I want, not what you will 100% get._
 
-**Notes:**
-- What account refers to is having a database with login data, having the user login and letting them logout, etc.
-- Whimsy isn't made for a replacement to usual chat apps, so accounts are not actually planned. Also, a database would be needed, alongside authentication, two things that I don't know how to manage and can't pay. The nearest things to accounts is having a unique username.
+Now, instead of trusting LocalTunnel, you just open the server to the port you want and handle it's public avaliablity (can even open it to LocalTunnel).
 
-## How does it work?
-When using Whimsy, you can either join or host a chat room. Whimsy uses a local tunnel + websocket system to open a local server in the host's machine and allow for other people to join.
+Also, the backend is being reworked, and as now it's being made into a user-hosted centralized app, more features, including QoL changes, security improvments, etc.
 
-![Visual representation of join/host system](https://github.com/user-attachments/assets/e9394d47-da20-4c0e-80f2-b7cc0b8a6e56)
+Things like:
+
+- Accounts (per-server, tho could make shared accounts client-side).
+- Attachments, such as photos, videos, voice messages, etc. Maximum file size can be configured, with default being probably something between 100MB and 125MB.
+- Banning, either through simple ID banning, or IP banning.
+- Cool commands (old version had only a command to get pretty JSON of the server's raw info).
+- And more!
+
+Also, the client is probably getting an UI, tho it will first be also a terminal client.
