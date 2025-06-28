@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/Nykenik24/whimsy/event"
+	"github.com/Nykenik24/whimsy/internal/event"
 	"github.com/gorilla/websocket"
 )
 

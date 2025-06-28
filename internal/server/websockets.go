@@ -5,11 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Nykenik24/whimsy/event"
+	"github.com/Nykenik24/whimsy/internal/event"
 	"github.com/gorilla/websocket"
 )
 
-func (s *Server) AddEventHandler(eventType string, handler event.EventHandler) error {
+func (s *Server) On(eventType string, handler event.EventHandler) error {
 	if _, alreadyExists := s.eventHandlers[eventType]; alreadyExists {
 		return fmt.Errorf("Handler for '%s' already exists", eventType)
 	}
@@ -17,7 +17,7 @@ func (s *Server) AddEventHandler(eventType string, handler event.EventHandler) e
 	return nil
 }
 
-func (s *Server) OverrideEventHandler(eventType string, newHandler event.EventHandler) error {
+func (s *Server) OverrideHandler(eventType string, newHandler event.EventHandler) error {
 	if _, exists := s.eventHandlers[eventType]; !exists {
 		return fmt.Errorf("Trying to override handler for '%s', which doesn't exist exist", eventType)
 	}

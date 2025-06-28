@@ -18,13 +18,18 @@ func main() {
 	s := server.NewServer(host)
 	s.Config.WebsocketSub = "/"
 
-	s.AddEventHandler("log", func(payload map[string]any) error {
+	s.On("log", func(payload map[string]any) error {
 		msg, hasMsg := payload["msg"]
 		if !hasMsg {
 			return errors.New("Server: no message in 'log' event payload")
 		}
 		fmt.Println("Message from client:", msg)
 		return s.SendToAll("log", map[string]any{"msg": msg})
+	})
+
+	s.On("connect", func(payload map[string]any) error {
+		fmt.Println("New client connected")
+		return nil
 	})
 
 	log.Printf("Serving at 'http://%s', websocket at 'ws://%s%s'\n", host, host, s.Config.WebsocketSub)
@@ -38,7 +43,7 @@ func main() {
 
 	c := client.NewClient(fmt.Sprintf("http://%s", host), fmt.Sprintf("ws://%s%s", host, s.Config.WebsocketSub))
 
-	c.AddEventHandler("log", func(payload map[string]any) error {
+	c.On("log", func(payload map[string]any) error {
 		msg, hasMsg := payload["msg"]
 		if !hasMsg {
 			return errors.New("Client: no message in 'log' event payload")

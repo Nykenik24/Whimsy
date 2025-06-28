@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Nykenik24/whimsy/event"
+	"github.com/Nykenik24/whimsy/internal/event"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,10 +24,12 @@ func NewClient(host, wsHost string) *Client {
 	if err != nil {
 		log.Fatal("Error connecting to Websocket Server:", err)
 	}
-	return &Client{ClientHosts{host, wsHost}, make(map[string]event.EventHandler), conn}
+	c := &Client{ClientHosts{host, wsHost}, make(map[string]event.EventHandler), conn}
+	c.Send("connect", map[string]any{})
+	return c
 }
 
-func (c *Client) AddEventHandler(eventType string, handler event.EventHandler) error {
+func (c *Client) On(eventType string, handler event.EventHandler) error {
 	if _, alreadyExists := c.eventHandlers[eventType]; alreadyExists {
 		return fmt.Errorf("Handler for '%s' already exists in client", eventType)
 	}
@@ -35,7 +37,7 @@ func (c *Client) AddEventHandler(eventType string, handler event.EventHandler) e
 	return nil
 }
 
-func (c *Client) OverrideEventHandler(eventType string, newHandler event.EventHandler) error {
+func (c *Client) OverrideHandler(eventType string, newHandler event.EventHandler) error {
 	if _, exists := c.eventHandlers[eventType]; !exists {
 		return fmt.Errorf("Trying to override handler for '%s', which doesn't exist exist in client", eventType)
 	}
