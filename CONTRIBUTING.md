@@ -144,10 +144,7 @@ Updating, improving and correcting the documentation
 
 ## Styleguides
 ### Commit Messages
-When making a commit, you must follow this rules:
-- Make the commit messages brief and understandable.
-- Follow this format: `[TYPE] (issues or PRs (e.g #1)) Commit message`
-    - `TYPE` might be `TWEAK`, `BACKEND`, `FRONTEND`, etc.
+When making a commit, you must follow [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Credits
 This contributing guide was made with [this awesome generator](https://contributing.md/generator)!
