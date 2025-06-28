@@ -8,6 +8,8 @@
     - [x] Make small, simple client abstraction
     - [ ] Implement main events
 - [ ] REST
+  - [x] Make very simple helper functions
+  - [ ] Implement parameters in routes (e.g. `/users/{id}`, where `id` is the parameter)
   - [ ] Implement main routes
     - [ ] `/users`: get all users
       - [ ] `/users/{id}`: get user with ID `{id}`.

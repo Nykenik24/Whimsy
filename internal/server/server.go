@@ -12,6 +12,7 @@ type Server struct {
 	eventHandlers map[string]event.EventHandler
 	conns         map[*websocket.Conn]struct{}
 	Config        *ServerConfig
+	serveMux      *http.ServeMux
 }
 
 func NewServer(host string) *Server {
@@ -20,10 +21,11 @@ func NewServer(host string) *Server {
 		eventHandlers: make(map[string]event.EventHandler),
 		conns:         make(map[*websocket.Conn]struct{}),
 		Config:        &ServerConfig{"/ws"},
+		serveMux:      http.NewServeMux(),
 	}
 }
 
 func (s *Server) ListenAndServe() error {
-	http.HandleFunc(s.Config.WebsocketSub, s.GetSocketHandler())
-	return http.ListenAndServe(s.host, nil)
+	s.serveMux.HandleFunc(s.Config.WebsocketSub, s.GetSocketHandler())
+	return http.ListenAndServe(s.host, s.serveMux)
 }
