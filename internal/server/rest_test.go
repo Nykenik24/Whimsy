@@ -25,17 +25,17 @@ func (r *personRepo) Add(p *person) {
 }
 
 func (r *personRepo) Remove(p *person) {
-	for i, v := range r.People {
-		if v.Name == p.Name {
-			r.People[i] = r.People[len(r.People)-1]
-			r.People = r.People[:len(r.People)-1]
+	for i := 0; i < len(r.People); i++ {
+		if r.People[i].Name == p.Name {
+			r.People = append(r.People[:i], r.People[i+1:]...)
+			i--
 		}
 	}
 }
 
 var (
-	PersonRe         = regexp.MustCompile(`^/people/$`)
-	PersonReWithName = regexp.MustCompile(`^/people/\w+$`)
+	PersonRe         = regexp.MustCompile(`^/people/?$`)
+	PersonReWithName = regexp.MustCompile(`^/people/(\w+)$`)
 )
 
 func newPerson(name, surname string) *person {
@@ -54,17 +54,20 @@ func RESTTest(t *testing.T) {
 	}
 
 	repo := newPersonRepo()
+	repo.Add(newPerson("John", "Doe"))
+	repo.Add(newPerson("Ben", "Dover"))
 
 	s.HTTPGet("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "<h1>Hello!</h1>")
 		fmt.Fprintln(w, "<p>Send a request to /people/ or /people/{name}</p>")
-		w.WriteHeader(http.StatusOK)
 	}, errHandler)
 
 	s.HTTPGetRegex("/people", *PersonRe, func(w http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(repo.People)
 		if err != nil {
 			errHandler(w, r, fmt.Sprintf("Error when marhsaling person repo: %s\n", err))
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -75,6 +78,7 @@ func RESTTest(t *testing.T) {
 		matches := PersonReWithName.FindStringSubmatch(r.URL.Path)
 		if len(matches) < 2 {
 			errHandler(w, r, "expected name when doing a GET request with name to /people/")
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
@@ -88,11 +92,14 @@ func RESTTest(t *testing.T) {
 		}
 		if p == nil {
 			errHandler(w, r, "could not find person "+expectedName)
+			w.WriteHeader(http.StatusNotFound)
+			return
 		}
 
 		data, err := json.Marshal(p)
 		if err != nil {
 			errHandler(w, r, fmt.Sprintf("Error when marhsaling person repo: %s\n", err))
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
