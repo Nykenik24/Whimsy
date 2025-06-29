@@ -1,4 +1,4 @@
-## - [ ] Phase 1: Wrappers, thin abstractions
+## Phase 1: Wrappers, thin abstractions
 
 - [x] WebSockets
   - [x] Server
@@ -9,7 +9,7 @@
   - [x] Make very simple helper functions
   - [ ] Implement parameters in routes (e.g. `/users/{id}`, where `id` is the parameter)
 
-## - [ ] Phase 2: Server models and services
+## Phase 2: Server models and services
 
 - [ ] Models
   - [ ] User model
@@ -42,7 +42,7 @@
     - [ ] Access configuration through REST API
     - [ ] Modify configuration through REST API (using token)
 
-## - [ ] Phase 3: API
+## Phase 3: API
 
 - [ ] REST
   - [ ] Implement main routes
