@@ -1,26 +1,15 @@
-## Phase 1: Wrappers, thin abstractions
+## - [ ] Phase 1: Wrappers, thin abstractions
 
-- [ ] WebSockets
-  - [ ] Server
+- [x] WebSockets
+  - [x] Server
     - [x] Make small, simple wrapper for `gorilla/websocket`
-    - [ ] Implement main events
-  - [ ] Client
+  - [x] Client
     - [x] Make small, simple client abstraction
-    - [ ] Implement main events
 - [ ] REST
   - [x] Make very simple helper functions
   - [ ] Implement parameters in routes (e.g. `/users/{id}`, where `id` is the parameter)
-  - [ ] Implement main routes
-    - [ ] `/users`: get all users
-      - [ ] `/users/{id}`: get user with ID `{id}`.
-      - [ ] `/users/connected`: get all connected users.
-      - [ ] `/users/disconnected`: get all disconnected users.
-    - [ ] `/channels`: get all channels
-      - [ ] `/channels/{id}`: get channel with ID `{id}`.
-      - [ ] `/channels/{id}/messages`: get messages of channel with ID `{id}`.
-    - [ ] `/admin`: admin "panel" (needs bearer token in the Authorization header).
 
-## Phase 2: Server models and services
+## - [ ] Phase 2: Server models and services
 
 - [ ] Models
   - [ ] User model
@@ -52,3 +41,21 @@
     - [ ] Use `whimsy.yaml` configuration file
     - [ ] Access configuration through REST API
     - [ ] Modify configuration through REST API (using token)
+
+## - [ ] Phase 3: API
+
+- [ ] REST
+  - [ ] Implement main routes
+    - [ ] `/users`: get all users
+      - [ ] `/users/{id}`: get user with ID `{id}`.
+      - [ ] `/users/connected`: get all connected users.
+      - [ ] `/users/disconnected`: get all disconnected users.
+    - [ ] `/channels`: get all channels
+      - [ ] `/channels/{id}`: get channel with ID `{id}`.
+      - [ ] `/channels/{id}/messages`: get messages of channel with ID `{id}`.
+    - [ ] `/admin`: admin "panel" (needs bearer token in the Authorization header).
+- [ ] WebSockets
+  - [ ] Server
+    - [ ] Implement main events
+  - [ ] Client
+    - [ ] Implement main events
