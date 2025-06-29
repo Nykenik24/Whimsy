@@ -1,3 +1,4 @@
 release/
 .oldversion
 #node_modules/
+main.go

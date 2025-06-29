@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"testing"
 
 	"github.com/Nykenik24/whimsy/internal/server"
 )
 
-func ServerTest() {
+func ServerTest(t *testing.T) {
 	host := "localhost:8000"
 	s := server.NewServer(host)
 	s.Config.WebsocketSub = "/"

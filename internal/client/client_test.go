@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"testing"
 	"time"
 
 	"github.com/Nykenik24/whimsy/internal/client"
@@ -14,7 +15,7 @@ import (
 
 var interrupt chan os.Signal
 
-func ClientTest() {
+func ClientTest(t *testing.T) {
 	host := "localhost:8000"
 	c := client.NewClient(fmt.Sprintf("http://%s", host), fmt.Sprintf("ws://%s%s", host, "/ws"))
 
