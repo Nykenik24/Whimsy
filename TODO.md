@@ -1,13 +1,13 @@
-## Phase 1: Wrappers, thin abstractions
+## ~~Phase 1: Wrappers, thin abstractions~~ _Done!_
 
 - [x] WebSockets
   - [x] Server
     - [x] Make small, simple wrapper for `gorilla/websocket`
   - [x] Client
     - [x] Make small, simple client abstraction
-- [ ] REST
+- [x] REST
   - [x] Make very simple helper functions
-  - [ ] Implement parameters in routes (e.g. `/users/{id}`, where `id` is the parameter)
+  - [x] Implement parameters in routes (e.g. `/users/{id}`, where `id` is the parameter)
 
 ## Phase 2: Server models and services
 
